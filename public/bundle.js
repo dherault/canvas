@@ -115,10 +115,11 @@ const state = {
 };
 
 canvas.addEventListener('mousemove', e => {
-  state.mousePos = {
+  state.mousePos = fromViewBox(state, {
     x: e.clientX,
     y: e.clientY,
-  };
+  });
+  draw(state);
 });
 
 canvas.addEventListener('mousedown', e => {
@@ -133,8 +134,8 @@ canvas.addEventListener('mouseup', e => {
 
 canvas.addEventListener('mousemove', e => {
   if (state.isMouseDown) {
-    const nextX = state.previousViewBoxOrigin.x + (state.panOrigin.x - state.mousePos.x) * state.viewBoxRelativeSize;
-    const nextY = state.previousViewBoxOrigin.y + (state.panOrigin.y - state.mousePos.y) * state.viewBoxRelativeSize;
+    const nextX = state.previousViewBoxOrigin.x + state.panOrigin.x - state.mousePos.x;
+    const nextY = state.previousViewBoxOrigin.y + state.panOrigin.y - state.mousePos.y;
     const r = 1 - 1 * state.viewBoxRelativeSize;
 
     state.viewBoxOrigin = {
@@ -191,6 +192,13 @@ function toViewBox(state, p) {
   };
 }
 
+function fromViewBox(state, p) {
+  return {
+    x: p.x * state.viewBoxRelativeSize + state.viewBoxOrigin.x,
+    y: p.y * state.viewBoxRelativeSize + state.viewBoxOrigin.y,
+  };
+}
+
 function draw(state) {
   _.clearRect(0, 0, state.width, state.height);
 
@@ -214,9 +222,9 @@ function draw(state) {
 
   _.font = '16px sans-serif';
   _.fillStyle = 'black';
-  _.fillText(`viewBoxOrigin: ${state.viewBoxOrigin.x} ${state.viewBoxOrigin.y}`, 10, 30);
-  _.fillText(`mousePos: ${state.mousePos.x} ${state.mousePos.y}`, 10, 50);
-
+  _.fillText(`width height: ${state.width} ${state.height}`, 10, 30);
+  _.fillText(`viewBoxOrigin: ${Math.round(state.viewBoxOrigin.x)} ${Math.round(state.viewBoxOrigin.y)}`, 10, 50);
+  _.fillText(`mousePos: ${Math.round(state.mousePos.x)} ${Math.round(state.mousePos.y)}`, 10, 70);
 }
 
 draw(state);
